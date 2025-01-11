@@ -1,0 +1,29 @@
+Packet received: "normal packet"
+Packet processed: "normal packet"
+Mean broken packets: 0.0
+Total packets received so far: 1
+Total denied packets: 0
+Mean is below threshold. All packets will be accepted.
+
+Packet received: ""
+Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
+Denied empty packet.
+
+Packet received: ""
+Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
+Denied empty packet.
+
+Packet received: "another packet"
+Packet processed: "another packet"
+Mean broken packets: 0.00
+Total packets received so far: 4
+Total denied packets: 2
+Mean is below threshold. All packets will be accepted.
+
+Packet received: ""
+Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
+Denied empty packet.
+
+Packet received: ""
+Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
+Denied empty packet.
