@@ -1,5 +1,3 @@
-import javafx.application.Platform;
-
 import java.io.*;
 import java.net.*;
 import java.util.Random;
@@ -13,6 +11,8 @@ public class PacketSender {
     public static boolean isRunning = true;
     private static final int SLEEP_TIME_L_BORDER = 10;
     private static final int SLEEP_TIME_U_BORDER = 1000;
+    private static int INT_ATTACK_PACKETS = 100;
+    public static boolean Attack = false;
 
 
     public static void sendPacket() {
@@ -31,6 +31,18 @@ public class PacketSender {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public void sendAttackPackets(){
+        System.out.println("Our server has been attacked!!!");
+        for (int i = 0; i < INT_ATTACK_PACKETS; i++){
+            sendNormalPacket();
+        }
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

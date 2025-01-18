@@ -37,7 +37,6 @@ public class DOSDetector {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
             String packet;
             while ((packet = reader.readLine()) != null) {
-                synchronized (this) {
                     totalPacketCount++;
                     if (denyBrokenPackets(packet)) {
                         continue;
@@ -47,7 +46,6 @@ public class DOSDetector {
                     }
                     //logging
                     updateTrafficData();
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,8 +77,8 @@ public class DOSDetector {
                 throttling = false;
                 System.out.println("Throttling deactivated. Accepting all packets.");
             }
-            if (isEmpty && throttling) {
-                System.out.println("Denied empty packet due to throttling.");
+            if (throttling) {
+                System.out.println("Denying packets due to throttling.");
                 return true;
             }
         return false;
@@ -92,7 +90,7 @@ public class DOSDetector {
             if (recentPackets.isEmpty()) {
                 return 0;
             }else{
-                return (double) acceptedCount / totalPacketCount;
+                return (double) acceptedCount / recentPackets.size();
             }
     }
 

@@ -30,7 +30,7 @@ public class App extends Application {
         yAxis1.setLabel("Packets");
 
         LineChart<Number, Number> packetChart = new LineChart<>(xAxis1, yAxis1);
-        packetChart.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        packetChart.getStylesheets().add("file:src/packetChartStyle.css");
 
         yAxis1.setAutoRanging(true);
         packetChart.setTitle("Total and Accepted Packets");
@@ -50,8 +50,8 @@ public class App extends Application {
         yAxis2.setLabel("Load (%)");
 
         LineChart<Number, Number> loadChart = new LineChart<>(xAxis2, yAxis2);
+        loadChart.getStylesheets().add("file:src/loadStyle.css");
         yAxis2.setAutoRanging(true);
-        loadChart.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         loadChart.setTitle("Network Load and Limit");
 
         XYChart.Series<Number, Number> networkLoadSeries = new XYChart.Series<>();
@@ -68,17 +68,24 @@ public class App extends Application {
         StackPane root = new StackPane();
         Button startButton = new Button("Start");
         Button stopButton = new Button("Stop");
+        Button attackButton = new Button("Attack");
 
+
+        attackButton.setOnAction(e -> startAttack());
         startButton.setOnAction(e -> startDetecting(totalPacketsSeries, acceptedPacketsSeries, networkLoadSeries, limitSeries));
         stopButton.setOnAction(e -> stopDetecting());
 
-        VBox layout = new VBox(10, startButton, stopButton, chartsLayout);
+        VBox layout = new VBox(10, startButton, stopButton, attackButton, chartsLayout);
         root.getChildren().add(layout);
 
 
         Scene scene = new Scene(root, 800, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void startAttack() {
+        sender.sendAttackPackets();
     }
 
     private void startUpdatingGraph(XYChart.Series<Number, Number> totalPacketsSeries,
