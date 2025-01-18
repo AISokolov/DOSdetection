@@ -3,44 +3,29 @@ import java.net.*;
 import java.util.*;
 
 public class DOSDetector {
-
     private static final int PORT = 8081;
-    private static final double MAX_EMPTY_PACKET_THRESHOLD = 0.1;
+    private static final double DENY_UPPER_LIMIT = 0.6;
+    private static final double DENY_LOWER_LIMIT = 0.5;
 
-    private List<PacketStatus> packets = new ArrayList<>();
-    private int deniedBrokenPacketCount = 0;
-    public int totalPacketCount = 0;
-    public static boolean isRunning = true;
-    public int acceptedPackets = 0;
+    private boolean throttling = false;
 
-    public static void main(String[] args) {
-        DOSDetector detector = new DOSDetector();
-        detector.startServer();
-    }
+    private static int LIMIT_MEM_USAGE = 100;
 
-    private static class PacketStatus {
-        private final boolean isBroken;
+    private int totalPacketCount = 0;
+    private int acceptedPackets = 0;
+    private boolean isRunning = true;
 
-        public PacketStatus(boolean isBroken) {
-            this.isBroken = isBroken;
-        }
-
-        public boolean isBroken() {
-            return isBroken;
-        }
-    }
+    private final List<String> recentPackets = new ArrayList<>();
 
     public void startServer() {
-        while (isRunning) {
-            try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-                System.out.println("Server started on port " + PORT);
-                while (true) {
-                    Socket clientSocket = serverSocket.accept();
-                    handleClient(clientSocket);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server started on port " + PORT);
+            while (isRunning) {
+                Socket clientSocket = serverSocket.accept();
+                handleClient(clientSocket);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -52,18 +37,17 @@ public class DOSDetector {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
             String packet;
             while ((packet = reader.readLine()) != null) {
-                totalPacketCount++;
-                System.out.println("Packet received: " + packet );
-
-                if (DenyBrokenPackets(packet)) {
-                    deniedBrokenPacketCount++;
-                    System.out.println("Denied empty packet.");
-                    continue;
+                synchronized (this) {
+                    totalPacketCount++;
+                    if (denyBrokenPackets(packet)) {
+                        continue;
+                    }
+                    if (!packet.isEmpty()) {
+                        acceptedPackets++;
+                    }
+                    //logging
+                    updateTrafficData();
                 }
-
-                boolean isEmpty = packet.isEmpty();
-                packets.add(new PacketStatus(isEmpty));
-                analyzeTraffic();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,41 +60,56 @@ public class DOSDetector {
         }
     }
 
-    //Deny empty packets only if the mean is above or equal to the threshold
-    private boolean DenyBrokenPackets(String packet) {
-        double meanBrokenPackets = getMeanBrokenPackets();
+    private boolean denyBrokenPackets(String packet) {
         boolean isEmpty = packet.isEmpty();
+            recentPackets.add(packet);
 
-        if (meanBrokenPackets >= MAX_EMPTY_PACKET_THRESHOLD && isEmpty) {
-            System.out.printf("Current mean: %.2f, Threshold: %.2f. Empty packet will be denied.\n",
-                    meanBrokenPackets, MAX_EMPTY_PACKET_THRESHOLD);
-            return true;
-        }
+            //not overflow the buffer
+            if (recentPackets.size() > LIMIT_MEM_USAGE) {
+                recentPackets.remove(0);
+            }
 
+            double loadPercentage = calculateLoad();
+
+
+            if (loadPercentage >= DENY_UPPER_LIMIT) {
+                throttling = true;
+                System.out.println("Throttling activated. Denying empty packets.");
+            } else if (loadPercentage <= DENY_LOWER_LIMIT) {
+                throttling = false;
+                System.out.println("Throttling deactivated. Accepting all packets.");
+            }
+            if (isEmpty && throttling) {
+                System.out.println("Denied empty packet due to throttling.");
+                return true;
+            }
         return false;
     }
 
-    private void analyzeTraffic() {
-        double meanBrokenPackets = getMeanBrokenPackets();
-
-        System.out.printf("Mean broken packets: %.2f%n", meanBrokenPackets);
-        System.out.println("Total packets received: " + totalPacketCount);
-        System.out.println("Total denied packets: " + deniedBrokenPacketCount);
-
-        if (meanBrokenPackets >= MAX_EMPTY_PACKET_THRESHOLD) {
-            System.out.println("Denying empty packets");
-        } else {
-            System.out.println("Accepted.");
-            acceptedPackets++;
-        }
+    private double calculateLoad() {
+            //filter for valid no empty packets
+            long acceptedCount = recentPackets.stream().filter(p -> !p.isEmpty()).count();
+            if (recentPackets.isEmpty()) {
+                return 0;
+            }else{
+                return (double) acceptedCount / totalPacketCount;
+            }
     }
 
-    public double getMeanBrokenPackets() {
-        long brokenPackets = packets.stream().filter(packets -> packets.isBroken).count();
-        if (packets.isEmpty()){
-            return 0.0;
-        } else {
-            return (double) brokenPackets / packets.size();
-        }
+    private void updateTrafficData() {
+        System.out.printf("Total Packets: %d, Accepted Packets: %d%n", totalPacketCount, acceptedPackets);
+        System.out.printf("Current Load: %.2f%%%n", calculateLoad() * 100);
+    }
+
+    public int getTotalPacketCount() {
+        return totalPacketCount;
+    }
+
+    public int getAcceptedPackets() {
+        return acceptedPackets;
+    }
+
+    public double getLoadPercentage() {
+        return calculateLoad();
     }
 }

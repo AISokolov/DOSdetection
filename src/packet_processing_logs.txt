@@ -1,29 +1,335 @@
-Packet received: "normal packet"
-Packet processed: "normal packet"
-Mean broken packets: 0.0
-Total packets received so far: 1
-Total denied packets: 0
-Mean is below threshold. All packets will be accepted.
+C:\Users\Владелец\.jdks\openjdk-21.0.1\bin\java.exe --module-path "C:\Program Files\Java\javafx-sdk-23.0.1\lib" --add-modules javafx.controls,javafx.fxml "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2024.3\lib\idea_rt.jar=59152:C:\Program Files\JetBrains\IntelliJ IDEA 2024.3\bin" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath "C:\Users\Владелец\IdeaProjects\Project\out\production\Project;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx-swt.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.web.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.base.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.fxml.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.media.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.swing.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.controls.jar;C:\Program Files\Java\javafx-sdk-23.0.1\lib\javafx.graphics.jar" App
+Server started on port 8081
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 1, Accepted Packets: 0
+Current Load: 0,00%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 2, Accepted Packets: 1
+Current Load: 50,00%
+Sent a normal packet.
+Throttling activated. Denying empty packets.
+Total Packets: 3, Accepted Packets: 2
+Current Load: 66,67%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 4, Accepted Packets: 2
+Current Load: 50,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 5, Accepted Packets: 2
+Current Load: 40,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 6, Accepted Packets: 2
+Current Load: 33,33%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 7, Accepted Packets: 2
+Current Load: 28,57%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 8, Accepted Packets: 2
+Current Load: 25,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 9, Accepted Packets: 2
+Current Load: 22,22%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 10, Accepted Packets: 3
+Current Load: 30,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 11, Accepted Packets: 3
+Current Load: 27,27%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 12, Accepted Packets: 3
+Current Load: 25,00%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 13, Accepted Packets: 4
+Current Load: 30,77%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 14, Accepted Packets: 5
+Current Load: 35,71%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 15, Accepted Packets: 5
+Current Load: 33,33%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 16, Accepted Packets: 5
+Current Load: 31,25%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 17, Accepted Packets: 5
+Current Load: 29,41%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 18, Accepted Packets: 5
+Current Load: 27,78%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 19, Accepted Packets: 6
+Current Load: 31,58%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 20, Accepted Packets: 7
+Current Load: 35,00%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 21, Accepted Packets: 8
+Current Load: 38,10%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 22, Accepted Packets: 9
+Current Load: 40,91%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 23, Accepted Packets: 9
+Current Load: 39,13%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 24, Accepted Packets: 10
+Current Load: 41,67%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 25, Accepted Packets: 11
+Current Load: 44,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 26, Accepted Packets: 11
+Current Load: 42,31%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 27, Accepted Packets: 12
+Current Load: 44,44%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 28, Accepted Packets: 13
+Current Load: 46,43%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 29, Accepted Packets: 13
+Current Load: 44,83%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 30, Accepted Packets: 14
+Current Load: 46,67%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 31, Accepted Packets: 14
+Current Load: 45,16%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 32, Accepted Packets: 15
+Current Load: 46,88%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 33, Accepted Packets: 16
+Current Load: 48,48%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 34, Accepted Packets: 16
+Current Load: 47,06%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 35, Accepted Packets: 17
+Current Load: 48,57%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 36, Accepted Packets: 18
+Current Load: 50,00%
+Sent a normal packet.
+Total Packets: 37, Accepted Packets: 19
+Current Load: 51,35%
+Sent a normal packet.
+Total Packets: 38, Accepted Packets: 20
+Current Load: 52,63%
+Sent a normal packet.
+Total Packets: 39, Accepted Packets: 21
+Current Load: 53,85%
+Sent an empty packet.
+Total Packets: 40, Accepted Packets: 21
+Current Load: 52,50%
+Sent a normal packet.
+Total Packets: 41, Accepted Packets: 22
+Current Load: 53,66%
+Sent an empty packet.
+Total Packets: 42, Accepted Packets: 22
+Current Load: 52,38%
+Sent an empty packet.
+Total Packets: 43, Accepted Packets: 22
+Current Load: 51,16%
+Sent a normal packet.
+Total Packets: 44, Accepted Packets: 23
+Current Load: 52,27%
+Sent a normal packet.
+Total Packets: 45, Accepted Packets: 24
+Current Load: 53,33%
+Sent an empty packet.
+Total Packets: 46, Accepted Packets: 24
+Current Load: 52,17%
+Sent a normal packet.
+Total Packets: 47, Accepted Packets: 25
+Current Load: 53,19%
+Sent an empty packet.
+Total Packets: 48, Accepted Packets: 25
+Current Load: 52,08%
+Sent a normal packet.
+Total Packets: 49, Accepted Packets: 26
+Current Load: 53,06%
+Sent a normal packet.
+Total Packets: 50, Accepted Packets: 27
+Current Load: 54,00%
+Sent a normal packet.
+Total Packets: 51, Accepted Packets: 28
+Current Load: 54,90%
+Sent a normal packet.
+Total Packets: 52, Accepted Packets: 29
+Current Load: 55,77%
+Sent an empty packet.
+Total Packets: 53, Accepted Packets: 29
+Current Load: 54,72%
+Sent an empty packet.
+Total Packets: 54, Accepted Packets: 29
+Current Load: 53,70%
+Sent an empty packet.
+Total Packets: 55, Accepted Packets: 29
+Current Load: 52,73%
+Sent an empty packet.
+Total Packets: 56, Accepted Packets: 29
+Current Load: 51,79%
+Sent an empty packet.
+Total Packets: 57, Accepted Packets: 29
+Current Load: 50,88%
+Sent a normal packet.
+Total Packets: 58, Accepted Packets: 30
+Current Load: 51,72%
+Sent an empty packet.
+Total Packets: 59, Accepted Packets: 30
+Current Load: 50,85%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 60, Accepted Packets: 30
+Current Load: 50,00%
+Sent a normal packet.
+Total Packets: 61, Accepted Packets: 31
+Current Load: 50,82%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 62, Accepted Packets: 31
+Current Load: 50,00%
+Sent a normal packet.
+Total Packets: 63, Accepted Packets: 32
+Current Load: 50,79%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 64, Accepted Packets: 32
+Current Load: 50,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 65, Accepted Packets: 32
+Current Load: 49,23%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 66, Accepted Packets: 33
+Current Load: 50,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 67, Accepted Packets: 33
+Current Load: 49,25%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 68, Accepted Packets: 34
+Current Load: 50,00%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 69, Accepted Packets: 34
+Current Load: 49,28%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 70, Accepted Packets: 34
+Current Load: 48,57%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 71, Accepted Packets: 34
+Current Load: 47,89%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 72, Accepted Packets: 34
+Current Load: 47,22%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 73, Accepted Packets: 35
+Current Load: 47,95%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 74, Accepted Packets: 35
+Current Load: 47,30%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 75, Accepted Packets: 35
+Current Load: 46,67%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 76, Accepted Packets: 36
+Current Load: 47,37%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 77, Accepted Packets: 37
+Current Load: 48,05%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 78, Accepted Packets: 37
+Current Load: 47,44%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 79, Accepted Packets: 37
+Current Load: 46,84%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 80, Accepted Packets: 38
+Current Load: 47,50%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 81, Accepted Packets: 38
+Current Load: 46,91%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 82, Accepted Packets: 39
+Current Load: 47,56%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 83, Accepted Packets: 40
+Current Load: 48,19%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 84, Accepted Packets: 40
+Current Load: 47,62%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 85, Accepted Packets: 41
+Current Load: 48,24%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 86, Accepted Packets: 42
+Current Load: 48,84%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 87, Accepted Packets: 42
+Current Load: 48,28%
+Sent a normal packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 88, Accepted Packets: 43
+Current Load: 48,86%
+Sent an empty packet.
+Throttling deactivated. Accepting all packets.
+Total Packets: 89, Accepted Packets: 43
+Current Load: 48,31%
 
-Packet received: ""
-Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
-Denied empty packet.
-
-Packet received: ""
-Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
-Denied empty packet.
-
-Packet received: "another packet"
-Packet processed: "another packet"
-Mean broken packets: 0.00
-Total packets received so far: 4
-Total denied packets: 2
-Mean is below threshold. All packets will be accepted.
-
-Packet received: ""
-Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
-Denied empty packet.
-
-Packet received: ""
-Current mean: 0.00, Threshold: 0.10. Empty packet will be denied.
-Denied empty packet.
+Process finished with exit code 0

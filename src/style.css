@@ -1,15 +1,28 @@
+/*I HAVE NO IDEA WHY COLORS ARE NOT APPLIED PROPERLY*/
+.chart-series-line {
+    -fx-stroke-width: 2px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: transparent;
+}
+
+.default-color1.chart-line-symbol {
+    -fx-background-color: transparent;
+}
+
 .default-color0.chart-series-line {
-    -fx-stroke: #656667;
-    -fx-stroke-width: 1px;
+    -fx-stroke: blue;
 }
 
 .default-color1.chart-series-line {
-    -fx-stroke: #ff0000;
-    -fx-stroke-width: 3px;
+    -fx-stroke: green;
 }
 
-.chart-line-symbol {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
+.default-color2.chart-series-line {
+    -fx-stroke: red;
 }
 
+.default-color3.chart-series-line {
+    -fx-stroke: orange;
+}

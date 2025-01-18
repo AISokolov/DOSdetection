@@ -8,13 +8,12 @@ public class PacketSender {
 
     private static final String HOST = "localhost";
     private static final int PORT = 8081;
-    private static final int MAX_PACKET_COUNT = 20;
-    private static final int MIN_PACKET_COUNT = 5;
+    private static final int MAX_PACKET_COUNT = 1000;
+    private static final int MIN_PACKET_COUNT = 50;
     public static boolean isRunning = true;
+    private static final int SLEEP_TIME_L_BORDER = 10;
+    private static final int SLEEP_TIME_U_BORDER = 1000;
 
-    public static void main(String[] args) {
-        sendPacket();
-    }
 
     public static void sendPacket() {
         Random random = new Random();
@@ -27,13 +26,14 @@ public class PacketSender {
                     sendEmptyPacket();
                 }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(random.nextInt(SLEEP_TIME_U_BORDER - SLEEP_TIME_L_BORDER + 1) + SLEEP_TIME_L_BORDER);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
     }
+
     public void stopSending() {
         isRunning = false;
     }
