@@ -14,14 +14,16 @@ public class DOSDetector {
     private int totalPacketCount = 0;
     private int acceptedPackets = 0;
     private boolean isRunning = true;
+    private ServerSocket server;
 
     private final List<String> recentPackets = new ArrayList<>();
 
     public void startServer() {
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+        try {
+            server = new ServerSocket(PORT);
             System.out.println("Server started on port " + PORT);
             while (isRunning) {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = server.accept();
                 handleClient(clientSocket);
             }
         } catch (IOException e) {

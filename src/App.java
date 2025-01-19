@@ -131,15 +131,10 @@ public class App extends Application {
         if (timer != null) {
             timer.cancel();
         }
-        if (dosDetectorExecutor != null && !dosDetectorExecutor.isShutdown()) {
-            dosDetectorExecutor.shutdown();
-        }
-        if (packetSenderExecutor != null && !packetSenderExecutor.isShutdown()) {
-            packetSenderExecutor.shutdown();
-        }
-
+        dosDetectorExecutor.shutdownNow();
+        packetSenderExecutor.shutdownNow();
+        sender.stopSending();
         detector.stopServer();
-        PacketSender.isRunning = false;
     }
 
     @Override
