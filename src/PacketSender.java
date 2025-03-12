@@ -6,27 +6,42 @@ public class PacketSender {
 
     private static final String HOST = "localhost";
     private static final int PORT = 8081;
-    private static final int MAX_PACKET_COUNT = 1000;
-    private static final int MIN_PACKET_COUNT = 50;
-    public static boolean isRunning = true;
-    private static final int SLEEP_TIME_L_BORDER = 10;
-    private static final int SLEEP_TIME_U_BORDER = 1000;
-    private static int INT_ATTACK_PACKETS = 100;
-    public static boolean Attack = false;
 
+
+    private static int maxPacketCount;
+    private static int minPacketCount;
+    public static boolean isRunning = true;
+    private static int sleepTimeLBorder;
+    private static int sleepTimeUBorder;
+
+    private static Random random = new Random();
+
+    private final App app;
+
+    public PacketSender(App app, int maxPacketCount, int minPacketCount, int sleepTimeLBorder, int sleepTimeUBorder) {
+        this.app = app;
+        this.maxPacketCount = maxPacketCount;
+        this.minPacketCount = minPacketCount;
+        this.sleepTimeLBorder = sleepTimeLBorder;
+        this.sleepTimeUBorder = sleepTimeUBorder;
+    }
 
     public static void sendPacket() {
-        Random random = new Random();
+        isRunning = true;
         while (isRunning) {
-            int packetCount = random.nextInt(MAX_PACKET_COUNT - MIN_PACKET_COUNT + 1) + MIN_PACKET_COUNT;
-            for (int i = 0; i < packetCount; i++) {
+            int packetCount = random.nextInt(maxPacketCount - minPacketCount + 1) + minPacketCount;
+            for (int i = 0; i < packetCount && isRunning; i++) {
                 if (random.nextBoolean()) {
                     sendNormalPacket();
                 } else {
                     sendEmptyPacket();
                 }
                 try {
-                    Thread.sleep(random.nextInt(SLEEP_TIME_U_BORDER - SLEEP_TIME_L_BORDER + 1) + SLEEP_TIME_L_BORDER);
+                    if (!App.isAttcked) {
+                        Thread.sleep(333);
+                    } else {
+                        Thread.sleep(random.nextInt(sleepTimeUBorder - sleepTimeLBorder + 1) + sleepTimeLBorder);
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -34,21 +49,6 @@ public class PacketSender {
         }
     }
 
-    public void sendAttackPackets(){
-        System.out.println("Our server has been attacked!!!");
-        for (int i = 0; i < INT_ATTACK_PACKETS; i++){
-            sendNormalPacket();
-        }
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void stopSending() {
-        isRunning = false;
-    }
     private static void sendNormalPacket() {
         try (Socket socket = new Socket(HOST, PORT);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
@@ -67,5 +67,9 @@ public class PacketSender {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void stopSending() {
+        isRunning = false;
     }
 }

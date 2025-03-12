@@ -1,0 +1,5 @@
+At time 19:41:58.949, the moving average reached 1,00
+At time 19:42:08.652, the moving average reached 0,80
+At time 19:42:08.691, the moving average reached 0,80
+At time 19:42:33.479, the moving average reached 0,80
+At time 19:42:33.541, the moving average reached 0,80
