@@ -6,36 +6,36 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 public class DOSDetector {
-    private static final int PORT = 8081;
-    private static final int MOVING_AVERAGE_WINDOW = 10; // Window size for moving average
+    private static final int BASE_PORT = 8081;
+    private static final int MOVING_AVERAGE_WINDOW = 10;
 
-
-    private static double warningThreshold;// Say 75% of packets are empty or full
-    private static int maximumPacketsLimit;
-    private static double timeGap;
+    private double warningThreshold;
+    private int maximumPacketsLimit;
+    private double timeGap;
     private int totalPacketCount = 0;
     private int acceptedPackets = 0;
     private boolean isRunning = true;
     private ServerSocket server;
+    private List<Double> movingAverageList = new ArrayList<>();
+    private long startTime = System.currentTimeMillis();
+    private final InstanceController controller;
+    private int instancePortOffset;
 
-    private final List<Double> movingAverageList = new ArrayList<>(); // Store moving average values
-
-    private long startTime = System.currentTimeMillis(); // Track start time for performance metrics
-
-    private final App app;
-
-    public DOSDetector(App app, double warningThreshold, int maximumPacketsLimit, double timeGap) {
-        this.app = app;
+    public DOSDetector(InstanceController controller, double warningThreshold,
+                       int maximumPacketsLimit, double timeGap) {
+        this.controller = controller;
         this.warningThreshold = warningThreshold;
         this.maximumPacketsLimit = maximumPacketsLimit;
         this.timeGap = timeGap;
+        this.instancePortOffset = controller.getInstanceNumber() - 1; // Port offset based on instance number
     }
 
     public void startServer() {
         isRunning = true;
         try {
-            server = new ServerSocket(PORT);
-            System.out.println("Server started on port " + PORT);
+            server = new ServerSocket(BASE_PORT + instancePortOffset);
+            System.out.println("Server for instance " + controller.getInstanceNumber() +
+                    " started on port " + (BASE_PORT + instancePortOffset));
             while (isRunning) {
                 Socket clientSocket = server.accept();
                 handleClient(clientSocket);
@@ -49,15 +49,16 @@ public class DOSDetector {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
             String packet;
             while ((packet = reader.readLine()) != null) {
-                totalPacketCount++;
-                if (!packet.isEmpty()) {
-                    acceptedPackets++;
-                        updateMovingAverage(1); // Increase moving average for normal packet
-                } else {
-                        updateMovingAverage(-1); // Decrease moving average for empty packet
+                synchronized (this) {
+                    totalPacketCount++;
+                    if (!packet.isEmpty()) {
+                        acceptedPackets++;
+                        updateMovingAverage(1);
+                    } else {
+                        updateMovingAverage(-1);
+                    }
+                    updateTrafficData();
                 }
-                // Logging
-                updateTrafficData();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,8 +73,6 @@ public class DOSDetector {
 
     private synchronized void updateMovingAverage(int value) {
         movingAverageList.add((double) value);
-
-        //Delete the oldest element
         if (movingAverageList.size() > MOVING_AVERAGE_WINDOW) {
             movingAverageList.remove(0);
         }
@@ -84,26 +83,20 @@ public class DOSDetector {
             return 0;
         }
         double sum = 0;
-
-        for (int i=0; i<movingAverageList.size(); i++) {
-            sum += movingAverageList.get(i);
+        for (Double value : movingAverageList) {
+            sum += value;
         }
-
         return sum / movingAverageList.size();
     }
 
     private synchronized void updateTrafficData() {
         double movingAverage = calculateMovingAverage();
         long currentTime = System.currentTimeMillis();
-        double elapsedTimeInMinutes = (currentTime - startTime) / 60000.0; // Convert to minutes
+        double elapsedTimeInMinutes = (currentTime - startTime) / 60000.0;
 
-        System.out.printf("Total Packets: %d, Accepted Packets: %d%n", totalPacketCount, acceptedPackets);
-        System.out.printf("Moving Average: %.2f%n", movingAverage);
-        System.out.printf("Packets per Minute: %.2f, Accepted Packets per Minute: %.2f%n",
-                totalPacketCount / elapsedTimeInMinutes,
-                acceptedPackets / elapsedTimeInMinutes);
+        System.out.printf("Instance %d - Packets per Minute: %.2f%n",
+                controller.getInstanceNumber(), totalPacketCount / elapsedTimeInMinutes);
 
-        // Check for warning condition
         if (Math.abs(movingAverage) >= warningThreshold) {
             showWarningNotification(currentTime, movingAverage);
         }
@@ -114,12 +107,13 @@ public class DOSDetector {
     }
 
     private void showMaximumTrafficNotification(long currentTime) {
-        app.stopSimulation();
+        controller.stopSimulation();
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
+            alert.setTitle("Warning - Instance " + controller.getInstanceNumber());
             alert.setHeaderText("Warning Notification");
-            alert.setContentText(String.format("Maximum amount of traffic has been reached at %s! The server has been stopped", new Date(currentTime)));
+            alert.setContentText(String.format("Maximum amount of traffic has been reached at %s! The server has been stopped",
+                    new Date(currentTime)));
             alert.showAndWait();
         });
     }
@@ -128,18 +122,16 @@ public class DOSDetector {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
         String formattedTime = sdf.format(new Date(time));
         Platform.runLater(() -> {
-            app.showWarningIcon();
+            controller.showWarningIcon();
         });
 
-        // Log warning to file
-        synchronized (this){
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("warning_log.txt", true))) {
-                writer.write(String.format("At time %s, the moving average reached %.2f%n", formattedTime, movingAverage));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter("warning_log_" + controller.getInstanceNumber() + "_" + controller.getInstanceName() + ".txt", true))) {
+            writer.write(String.format("At time %s, the moving average reached %.2f%n",
+                    formattedTime, movingAverage));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
     }
 
     public synchronized int getTotalPacketCount() {

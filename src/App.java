@@ -22,47 +22,70 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class App extends Application {
-    public DOSDetector detector;
-    public PacketSender sender;
-    public ExecutorService dosDetectorExecutor;
-    public ExecutorService packetSenderExecutor;
-    private int currentTime = 0;
-    private Timer timer = new Timer();
-    private ImageView warningIcon;
-    public static boolean isAttcked = false;
-    private boolean isUpdating = true;
+    private static final int NUM_INSTANCES = 3;
+    private ExecutorService appExecutor;
 
     @Override
     public void start(Stage primaryStage) {
-        detector = new DOSDetector(this,  0.75, 500, 0.5);
-        sender = new PacketSender(this, 100, 10, 10, 100);
+        int avalaibleProcessors = Runtime.getRuntime().availableProcessors() / 2;
+        appExecutor = Executors.newFixedThreadPool(avalaibleProcessors);
 
-        // chart: total Packets
+        for (int i = 0; i < NUM_INSTANCES; i++) {
+            int instanceNum = i + 1;
+            appExecutor.execute(() -> {
+                Platform.runLater(() -> createInstanceWindow(instanceNum));
+            });
+        }
+    }
+
+    private void createInstanceWindow(int instanceNumber) {
+        Stage stage = new Stage();
+        InstanceController controller = new InstanceController(instanceNumber);
+        switch (instanceNumber) {
+            case 1:
+                controller.setInstanceName("Prime_Time");
+                controller.detector = new DOSDetector(controller, 0.8, 1000, 0.5);
+                controller.sender = new PacketSender(controller, 200, 50, 5, 50);
+                stage.setTitle("DOS Detection - Prime Time Configuration");
+                break;
+            case 2:
+                controller.setInstanceName("Morning");
+                controller.detector = new DOSDetector(controller, 0.3, 300, 0.5);
+                controller.sender = new PacketSender(controller, 50, 5, 100, 200);
+                stage.setTitle("DOS Detection - Morning Configuration");
+                break;
+            case 3:
+                controller.setInstanceName("Night");
+                controller.detector = new DOSDetector(controller, 0.5, 700, 0.5);
+                controller.sender = new PacketSender(controller, 100, 10, 10, 100);
+                stage.setTitle("DOS Detection - Night Configuration");
+                break;
+        }
+
+        // total Packets
         NumberAxis xAxis1 = new NumberAxis();
         xAxis1.setLabel("Time");
         xAxis1.setAutoRanging(false);
         xAxis1.setLowerBound(0);
-        xAxis1.setUpperBound(100); // Initial range
+        xAxis1.setUpperBound(100);
         NumberAxis yAxis1 = new NumberAxis();
         yAxis1.setLabel("Packets");
 
         LineChart<Number, Number> packetChart = new LineChart<>(xAxis1, yAxis1);
         packetChart.getStylesheets().add("file:src/packetChartStyle.css");
-
         yAxis1.setAutoRanging(true);
         packetChart.setTitle("Total Packets");
 
         XYChart.Series<Number, Number> totalPacketsSeries = new XYChart.Series<>();
         totalPacketsSeries.setName("Total Packets");
-
         packetChart.getData().add(totalPacketsSeries);
 
-        // chart: moving average
+        // moving average
         NumberAxis xAxis2 = new NumberAxis();
         xAxis2.setLabel("Time");
         xAxis2.setAutoRanging(false);
         xAxis2.setLowerBound(0);
-        xAxis2.setUpperBound(100); // Initial range
+        xAxis2.setUpperBound(100);
         NumberAxis yAxis2 = new NumberAxis();
         yAxis2.setLabel("Average");
 
@@ -73,14 +96,14 @@ public class App extends Application {
 
         XYChart.Series<Number, Number> movingAverageSeries = new XYChart.Series<>();
         movingAverageSeries.setName("Average");
-
         loadChart.getData().add(movingAverageSeries);
 
         // warning icon
-        warningIcon = new ImageView(new Image("warning.png"));
-        warningIcon.setFitWidth(30); // Set the width of the icon
-        warningIcon.setFitHeight(30); // Set the height of the icon
+        ImageView warningIcon = new ImageView(new Image("warning.png"));
+        warningIcon.setFitWidth(30);
+        warningIcon.setFitHeight(30);
         warningIcon.setVisible(false);
+        controller.setWarningIcon(warningIcon);
 
         // layout
         HBox chartsLayout = new HBox(10, packetChart, loadChart, warningIcon);
@@ -90,33 +113,95 @@ public class App extends Application {
         Button attackButton = new Button("Attack");
         Button stopButton = new Button("Stop");
 
-        attackButton.setOnAction(e -> startAttack());
-        stopButton.setOnAction(e -> stopSimulation());
-        startButton.setOnAction(e -> startDetecting(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2));
+        attackButton.setOnAction(e -> controller.startAttack());
+        stopButton.setOnAction(e -> controller.stopSimulation());
+        startButton.setOnAction(e -> controller.startDetecting(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2));
 
         VBox layout = new VBox(10, startButton, attackButton, stopButton, chartsLayout);
         root.getChildren().add(layout);
 
-        Scene scene = new Scene(root, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(root, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @Override
+    public void stop() {
+        appExecutor.shutdownNow();
+        Platform.exit();
+        System.exit(0);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
+class InstanceController {
+    public DOSDetector detector;
+    public PacketSender sender;
+    public ExecutorService dosDetectorExecutor;
+    public ExecutorService packetSenderExecutor;
+    private int currentTime = 0;
+    private Timer timer = new Timer();
+    private ImageView warningIcon;
+    public boolean isAttacked = false;
+    private boolean isUpdating = true;
+    private final int instanceNumber;
+    public String instanceName;
+
+    public InstanceController(int instanceNumber) {
+        this.instanceNumber = instanceNumber;
+    }
+
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+    }
+
+    public int getInstanceNumber() {
+        return instanceNumber;
+    }
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setWarningIcon(ImageView warningIcon) {
+        this.warningIcon = warningIcon;
     }
 
     public void stopSimulation() {
         isUpdating = false;
-        dosDetectorExecutor.shutdown();
-        packetSenderExecutor.shutdown();
-        detector.stopServer();
-        sender.stopSending();
+        if (dosDetectorExecutor != null) dosDetectorExecutor.shutdown();
+        if (packetSenderExecutor != null) packetSenderExecutor.shutdown();
+        if (detector != null) detector.stopServer();
+        if (sender != null) sender.stopSending();
     }
 
-    private void startAttack() {
-        isAttcked = true;
+    public void startAttack() {
+        isAttacked = true;
+        System.out.println("Attack started on instance " + instanceNumber + instanceName);
     }
 
-    private void startUpdatingGraph(XYChart.Series<Number, Number> totalPacketsSeries,
-                                    XYChart.Series<Number, Number> movingAverageSeries,
-                                    NumberAxis xAxis1, NumberAxis xAxis2) {
+    public void startDetecting(XYChart.Series<Number, Number> totalPacketsSeries,
+                               XYChart.Series<Number, Number> movingAverageSeries,
+                               NumberAxis xAxis1, NumberAxis xAxis2) {
+        clearLogFile();
+        timer = new Timer();
+        startUpdatingGraph(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2);
+
+        isUpdating = true;
+
+        dosDetectorExecutor = Executors.newSingleThreadExecutor();
+        dosDetectorExecutor.execute(() -> detector.startServer());
+
+        packetSenderExecutor = Executors.newSingleThreadExecutor();
+        packetSenderExecutor.execute(() -> sender.sendPacket());
+    }
+
+    public void startUpdatingGraph(XYChart.Series<Number, Number> totalPacketsSeries,
+                                   XYChart.Series<Number, Number> movingAverageSeries,
+                                   NumberAxis xAxis1, NumberAxis xAxis2) {
         Timer graphTimer = new Timer();
         graphTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -145,46 +230,22 @@ public class App extends Application {
                     currentTime++;
                 });
             }
-        }, 0, 100); // Update every second (100 ms)
-    }
-
-    private void startDetecting(XYChart.Series<Number, Number> totalPacketsSeries,
-                                XYChart.Series<Number, Number> movingAverageSeries,
-                                NumberAxis xAxis1, NumberAxis xAxis2) {
-        clearLogFile(); // Clear the log file at the start of each simulation
-        timer = new Timer();
-        startUpdatingGraph(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2);
-
-        isUpdating = true;
-
-        dosDetectorExecutor = Executors.newSingleThreadExecutor();
-        dosDetectorExecutor.execute(() -> detector.startServer());
-
-        packetSenderExecutor = Executors.newSingleThreadExecutor();
-        packetSenderExecutor.execute(() -> sender.sendPacket());
+        }, 0, 100);
     }
 
     public void showWarningIcon() {
-        warningIcon.setVisible(true);
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> warningIcon.setVisible(false)));
-        timeline.play();
+        Platform.runLater(() -> {
+            warningIcon.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> warningIcon.setVisible(false)));
+            timeline.play();
+        });
     }
 
     public void clearLogFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("warning_log.txt"))) {
-            writer.write(""); // Clear the file content
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("warning_log_" + instanceNumber + "_" + instanceName + ".txt"))) {
+            writer.write("");
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void stop() {
-        Platform.exit();
-        System.exit(0);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
