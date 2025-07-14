@@ -2,6 +2,9 @@ import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
@@ -20,6 +23,7 @@ public class DOSDetector {
     private long startTime = System.currentTimeMillis();
     private final InstanceController controller;
     private int instancePortOffset;
+    private ExecutorService clientHandlerExecutor = Executors.newFixedThreadPool(4);
 
     public DOSDetector(InstanceController controller, double warningThreshold,
                        int maximumPacketsLimit, double timeGap) {
@@ -37,8 +41,16 @@ public class DOSDetector {
             System.out.println("Server for instance " + controller.getInstanceNumber() +
                     " started on port " + (BASE_PORT + instancePortOffset));
             while (isRunning) {
-                Socket clientSocket = server.accept();
-                handleClient(clientSocket);
+                try {
+                    Socket clientSocket = server.accept();
+                    clientHandlerExecutor.submit(() -> handleClient(clientSocket));
+                }
+                catch (IOException e) {
+                    if (!isRunning) {
+                        break; // Exit the loop if the server is stopped
+                    }
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,6 +109,9 @@ public class DOSDetector {
         System.out.printf("Instance %d - Packets per Minute: %.2f%n",
                 controller.getInstanceNumber(), totalPacketCount / elapsedTimeInMinutes);
 
+        System.out.printf("Instance %d - Packets Total: %d \n",
+                controller.getInstanceNumber(), totalPacketCount);
+
         if (Math.abs(movingAverage) >= warningThreshold) {
             showWarningNotification(currentTime, movingAverage);
         }
@@ -110,7 +125,7 @@ public class DOSDetector {
         controller.stopSimulation();
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - Instance " + controller.getInstanceNumber());
+            alert.setTitle("Warning - Instance " + controller.getInstanceName());
             alert.setHeaderText("Warning Notification");
             alert.setContentText(String.format("Maximum amount of traffic has been reached at %s! The server has been stopped",
                     new Date(currentTime)));

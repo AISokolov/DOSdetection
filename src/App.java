@@ -24,10 +24,10 @@ import java.util.concurrent.Executors;
 public class App extends Application {
     private static final int NUM_INSTANCES = 3;
     private ExecutorService appExecutor;
+    public int avalaibleProcessors = Runtime.getRuntime().availableProcessors() / 2;
 
     @Override
     public void start(Stage primaryStage) {
-        int avalaibleProcessors = Runtime.getRuntime().availableProcessors() / 2;
         appExecutor = Executors.newFixedThreadPool(avalaibleProcessors);
 
         for (int i = 0; i < NUM_INSTANCES; i++) {
@@ -39,25 +39,25 @@ public class App extends Application {
     }
 
     private void createInstanceWindow(int instanceNumber) {
-        Stage stage = new Stage();
+        Stage stage = new Stage(); // main window container
         InstanceController controller = new InstanceController(instanceNumber);
         switch (instanceNumber) {
             case 1:
                 controller.setInstanceName("Prime_Time");
                 controller.detector = new DOSDetector(controller, 0.8, 1000, 0.5);
-                controller.sender = new PacketSender(controller, 200, 50, 5, 50);
+                controller.sender = new PacketSender(controller, 200, 50, 5, 50, 350);
                 stage.setTitle("DOS Detection - Prime Time Configuration");
                 break;
             case 2:
                 controller.setInstanceName("Morning");
                 controller.detector = new DOSDetector(controller, 0.3, 300, 0.5);
-                controller.sender = new PacketSender(controller, 50, 5, 100, 200);
+                controller.sender = new PacketSender(controller, 50, 5, 100, 200, 600);
                 stage.setTitle("DOS Detection - Morning Configuration");
                 break;
             case 3:
                 controller.setInstanceName("Night");
                 controller.detector = new DOSDetector(controller, 0.5, 700, 0.5);
-                controller.sender = new PacketSender(controller, 100, 10, 10, 100);
+                controller.sender = new PacketSender(controller, 100, 10, 10, 100, 800);
                 stage.setTitle("DOS Detection - Night Configuration");
                 break;
         }
@@ -115,7 +115,7 @@ public class App extends Application {
 
         attackButton.setOnAction(e -> controller.startAttack());
         stopButton.setOnAction(e -> controller.stopSimulation());
-        startButton.setOnAction(e -> controller.startDetecting(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2));
+        startButton.setOnAction(e -> controller.startDetecting(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2, avalaibleProcessors));
 
         VBox layout = new VBox(10, startButton, attackButton, stopButton, chartsLayout);
         root.getChildren().add(layout);
@@ -185,17 +185,17 @@ class InstanceController {
 
     public void startDetecting(XYChart.Series<Number, Number> totalPacketsSeries,
                                XYChart.Series<Number, Number> movingAverageSeries,
-                               NumberAxis xAxis1, NumberAxis xAxis2) {
+                               NumberAxis xAxis1, NumberAxis xAxis2, int avalaibleProcessors) {
         clearLogFile();
         timer = new Timer();
         startUpdatingGraph(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2);
 
         isUpdating = true;
 
-        dosDetectorExecutor = Executors.newSingleThreadExecutor();
+        dosDetectorExecutor = Executors.newFixedThreadPool(avalaibleProcessors);
         dosDetectorExecutor.execute(() -> detector.startServer());
 
-        packetSenderExecutor = Executors.newSingleThreadExecutor();
+        packetSenderExecutor = Executors.newFixedThreadPool(avalaibleProcessors);
         packetSenderExecutor.execute(() -> sender.sendPacket());
     }
 

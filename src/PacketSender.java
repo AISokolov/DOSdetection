@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PacketSender {
     private static final String HOST = "localhost";
@@ -14,15 +16,18 @@ public class PacketSender {
     private Random random = new Random();
     private final InstanceController controller;
     private int instancePortOffset;
+    private  int defaultSleepTime; // Default sleep time in milliseconds
+    private ExecutorService packetSendExecutor = Executors.newFixedThreadPool(4); // или другое число потоков
 
     public PacketSender(InstanceController controller, int maxPacketCount, int minPacketCount,
-                        int sleepTimeLBorder, int sleepTimeUBorder) {
+                        int sleepTimeLBorder, int sleepTimeUBorder, int defaultSleepTime) {
         this.controller = controller;
         this.maxPacketCount = maxPacketCount;
         this.minPacketCount = minPacketCount;
         this.sleepTimeLBorder = sleepTimeLBorder;
         this.sleepTimeUBorder = sleepTimeUBorder;
-        this.instancePortOffset = controller.getInstanceNumber() - 1; // Port offset based on instance number
+        this.instancePortOffset = controller.getInstanceNumber() - 1; // 8081 + (instNum - 1)
+        this.defaultSleepTime = defaultSleepTime;
     }
 
     public void sendPacket() {
@@ -31,13 +36,13 @@ public class PacketSender {
             int packetCount = random.nextInt(maxPacketCount - minPacketCount + 1) + minPacketCount;
             for (int i = 0; i < packetCount && isRunning; i++) {
                 if (random.nextBoolean()) {
-                    sendNormalPacket();
+                    packetSendExecutor.submit(this::sendNormalPacket);
                 } else {
-                    sendEmptyPacket();
+                    packetSendExecutor.submit(this::sendEmptyPacket);
                 }
                 try {
                     if (!controller.isAttacked) {
-                        Thread.sleep(333);
+                        Thread.sleep(defaultSleepTime);
                     } else {
                         Thread.sleep(random.nextInt(sleepTimeUBorder - sleepTimeLBorder + 1) + sleepTimeLBorder);
                     }
@@ -48,7 +53,7 @@ public class PacketSender {
         }
     }
 
-    private synchronized void sendNormalPacket() {
+    private void sendNormalPacket() {
         try (Socket socket = new Socket(HOST, PORT + instancePortOffset);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
             writer.println("normal packet");
@@ -58,7 +63,7 @@ public class PacketSender {
         }
     }
 
-    private synchronized void sendEmptyPacket() {
+    private void sendEmptyPacket() {
         try (Socket socket = new Socket(HOST, PORT + instancePortOffset);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
             writer.println("");
