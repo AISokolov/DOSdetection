@@ -36,9 +36,9 @@ public class PacketSender {
             int packetCount = random.nextInt(maxPacketCount - minPacketCount + 1) + minPacketCount;
             for (int i = 0; i < packetCount && isRunning; i++) {
                 if (random.nextBoolean()) {
-                    packetSendExecutor.submit(this::sendNormalPacket);
+                    packetSendExecutor.submit(() -> sendNormalPacket());
                 } else {
-                    packetSendExecutor.submit(this::sendEmptyPacket);
+                    packetSendExecutor.submit(() -> sendEmptyPacket());
                 }
                 try {
                     if (!controller.isAttacked) {

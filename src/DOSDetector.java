@@ -16,7 +16,6 @@ public class DOSDetector {
     private int maximumPacketsLimit;
     private double timeGap;
     private int totalPacketCount = 0;
-    private int acceptedPackets = 0;
     private boolean isRunning = true;
     private ServerSocket server;
     private List<Double> movingAverageList = new ArrayList<>();
@@ -42,14 +41,14 @@ public class DOSDetector {
                     " started on port " + (BASE_PORT + instancePortOffset));
             while (isRunning) {
                 try {
-                    Socket clientSocket = server.accept();
+                    Socket clientSocket = server.accept(); // waiting for the client
                     clientHandlerExecutor.submit(() -> handleClient(clientSocket));
                 }
                 catch (IOException e) {
                     if (!isRunning) {
                         break; // Exit the loop if the server is stopped
                     }
-                    e.printStackTrace();
+                    e.printStackTrace(); //print detailed info about the exception
                 }
             }
         } catch (IOException e) {
@@ -58,13 +57,13 @@ public class DOSDetector {
     }
 
     private void handleClient(Socket clientSocket) {
+        // "packet" -> 321 321 33 44 56 10(\n) -> "packet"
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
             String packet;
             while ((packet = reader.readLine()) != null) {
                 synchronized (this) {
                     totalPacketCount++;
                     if (!packet.isEmpty()) {
-                        acceptedPackets++;
                         updateMovingAverage(1);
                     } else {
                         updateMovingAverage(-1);
@@ -139,7 +138,6 @@ public class DOSDetector {
         Platform.runLater(() -> {
             controller.showWarningIcon();
         });
-
         try (BufferedWriter writer = new BufferedWriter(
                 new FileWriter("warning_log_" + controller.getInstanceNumber() + "_" + controller.getInstanceName() + ".txt", true))) {
             writer.write(String.format("At time %s, the moving average reached %.2f%n",

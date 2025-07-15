@@ -24,11 +24,11 @@ import java.util.concurrent.Executors;
 public class App extends Application {
     private static final int NUM_INSTANCES = 3;
     private ExecutorService appExecutor;
-    public int avalaibleProcessors = Runtime.getRuntime().availableProcessors() / 2;
+    public int availableProcessors = Runtime.getRuntime().availableProcessors() / 2;
 
     @Override
     public void start(Stage primaryStage) {
-        appExecutor = Executors.newFixedThreadPool(avalaibleProcessors);
+        appExecutor = Executors.newFixedThreadPool(availableProcessors);
 
         for (int i = 0; i < NUM_INSTANCES; i++) {
             int instanceNum = i + 1;
@@ -115,7 +115,7 @@ public class App extends Application {
 
         attackButton.setOnAction(e -> controller.startAttack());
         stopButton.setOnAction(e -> controller.stopSimulation());
-        startButton.setOnAction(e -> controller.startDetecting(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2, avalaibleProcessors));
+        startButton.setOnAction(e -> controller.startDetecting(totalPacketsSeries, movingAverageSeries, xAxis1, xAxis2, availableProcessors));
 
         VBox layout = new VBox(10, startButton, attackButton, stopButton, chartsLayout);
         root.getChildren().add(layout);
