@@ -3,11 +3,11 @@ import java.util.Random;
 
 public class PacketSenderMPJ {
     private int rank;
-    private ConfigParams config;
+    private ScatterParams config;
     private Random random = new Random();
     public boolean isRunning = true;
 
-    public PacketSenderMPJ(int rank, ConfigParams config) {
+    public PacketSenderMPJ(int rank, ScatterParams config) {
         this.rank = rank;
         this.config = config;
     }

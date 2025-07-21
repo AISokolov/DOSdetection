@@ -26,7 +26,6 @@ public class AppMPJ extends JFrame {
     private static final int HISTORY_LIMIT = 100;
     private final Random random = new Random();
 
-    // Для контроля лимита трафика
     private long startTime = System.currentTimeMillis();
     private boolean isStoppedByLimit = false;
 
@@ -70,7 +69,7 @@ public class AppMPJ extends JFrame {
 
         startButton.setEnabled(true);
         stopButton.setEnabled(false);
-        attackButton.setEnabled(true);
+        attackButton.setEnabled(false);
     }
 
     private void startReceiving() {
