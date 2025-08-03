@@ -21,11 +21,11 @@ public class MainMPJ {
         //root(sender) process (rank 0) fills the arrays with data
         if (rank == 0) {
             for (int i = 1; i < size; i++) {
-                // i-1 MOD len
-                int configIdx = (i - 1) % configs.length;
-                ScatterParams sp = new ScatterParams(configs[configIdx]);
-                System.arraycopy(sp.toDoubleArray(), 0, allDoubles, i * 2, 2);
-                System.arraycopy(sp.toIntArray(), 0, allInts, i * 6, 6);
+                ScatterParams sp = new ScatterParams(configs[(i - 1) % configs.length]);
+                int doubleOffset = i * ScatterParams.DOUBLE_ARRAY_SIZE;
+                int intOffset = i * ScatterParams.INT_ARRAY_SIZE;
+                System.arraycopy(sp.toDoubleArray(), 0, allDoubles, doubleOffset, ScatterParams.DOUBLE_ARRAY_SIZE);
+                System.arraycopy(sp.toIntArray(), 0, allInts, intOffset, ScatterParams.INT_ARRAY_SIZE);
             }
         }
 

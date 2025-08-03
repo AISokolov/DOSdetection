@@ -14,7 +14,6 @@ public class AppMPJ extends JFrame {
     private List<Double> movingAverageList = new ArrayList<>();
 
     private JLabel warningLabel;
-    private int timeIndex = 0;
     private PacketChartPanel chartPanel;
 
     private JButton startButton, stopButton, attackButton;
@@ -24,6 +23,8 @@ public class AppMPJ extends JFrame {
 
     private javax.swing.Timer graphTimer;
     private static final int HISTORY_LIMIT = 100;
+    private static final int AVERAGE_WINDOW_SIZE = 10;
+
     private final Random random = new Random();
 
     private long startTime = System.currentTimeMillis();
@@ -91,7 +92,6 @@ public class AppMPJ extends JFrame {
             if (movingAverageHistory.size() > HISTORY_LIMIT) {
                 movingAverageHistory.remove(0);
             }
-            timeIndex++;
             chartPanel.repaint();
         });
         graphTimer.start();
@@ -135,7 +135,7 @@ public class AppMPJ extends JFrame {
 
     private synchronized void updateMovingAverage(int value) {
         movingAverageList.add((double) value);
-        if (movingAverageList.size() > 10) {
+        if (movingAverageList.size() > AVERAGE_WINDOW_SIZE) {
             movingAverageList.remove(0);
         }
     }
@@ -186,19 +186,12 @@ public class AppMPJ extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
-            g.setColor(Color.BLACK);
-            g.drawString("Time", getWidth() / 2 - 20, getHeight() - 10);
-            g.drawString("Moving avg value", 10, 30);
-
             int w = getWidth() - 60;
             int h = getHeight() - 60;
             int offsetX = 40;
             int offsetY = 40;
             int n = movingAverageHistory.size();
             if (n < 2) return;
-
-            g.drawLine(offsetX, offsetY, offsetX, offsetY + h); // Y
-            g.drawLine(offsetX, offsetY + h, offsetX + w, offsetY + h); // X
 
             double maxAvg = movingAverageHistory.get(0);
             double minAvg = movingAverageHistory.get(0);
@@ -225,18 +218,18 @@ public class AppMPJ extends JFrame {
             }
             g2.draw(path);
 
-            g.setColor(Color.GRAY);
-            int step = Math.max(1, n / 10);
-            for (int i = 0; i < n; i += step) {
-                int x = offsetX + (w * i) / (n - 1);
-                g.drawLine(x, offsetY + h, x, offsetY + h + 5);
-                g.drawString(String.valueOf((timeIndex - n + i) * 100 / 1000.0), x - 5, offsetY + h + 20); // X: seconds
-            }
-            for (int i = 0; i <= 5; i++) {
-                int y = offsetY + h - (h * i) / 5;
-                double value = minAvg + (range * i) / 5;
-                g.drawLine(offsetX - 5, y, offsetX, y);
-                g.drawString(String.format("%.2f", value), 2, y + 5);
+            if (!movingAverageHistory.isEmpty()) {
+                double currentValue = movingAverageHistory.get(movingAverageHistory.size() - 1);
+                String valueText = String.format("%.2f", currentValue);
+
+                Font font = new Font("Arial", Font.BOLD, 14);
+                g2.setFont(font);
+
+                FontMetrics metrics = g2.getFontMetrics(font);
+                int textWidth = metrics.stringWidth(valueText);
+
+                g2.setColor(Color.BLACK);
+                g2.drawString(valueText, getWidth() - textWidth - 10, getHeight() - 10);
             }
         }
     }
