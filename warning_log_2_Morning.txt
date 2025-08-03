@@ -1,3 +1,0 @@
-At time 23:32:47.839, the moving average reached -1,00
-At time 23:32:49.042, the moving average reached 0,33
-At time 23:32:49.643, the moving average reached 0,50
