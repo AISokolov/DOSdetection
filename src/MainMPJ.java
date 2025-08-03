@@ -16,8 +16,8 @@ public class MainMPJ {
         };
 
         // Prepare arrays for Scatter
-        double[] allDoubles = new double[2 * size];
-        int[] allInts = new int[6 * size];
+        double[] allDoubles = new double[ScatterParams.DOUBLE_ARRAY_SIZE * size];
+        int[] allInts = new int[ScatterParams.INT_ARRAY_SIZE * size];
         //root(sender) process (rank 0) fills the arrays with data
         if (rank == 0) {
             for (int i = 1; i < size; i++) {
@@ -29,11 +29,11 @@ public class MainMPJ {
             }
         }
 
-        double[] recvDoubles = new double[2];
-        int[] recvInts = new int[6];
+        double[] recvDoubles = new double[ScatterParams.DOUBLE_ARRAY_SIZE];
+        int[] recvInts = new int[ScatterParams.INT_ARRAY_SIZE];
 
-        MPI.COMM_WORLD.Scatter(allDoubles, 0, 2, MPI.DOUBLE, recvDoubles, 0, 2, MPI.DOUBLE, 0);
-        MPI.COMM_WORLD.Scatter(allInts, 0, 6, MPI.INT, recvInts, 0, 6, MPI.INT, 0);
+        MPI.COMM_WORLD.Scatter(allDoubles, 0, ScatterParams.DOUBLE_ARRAY_SIZE, MPI.DOUBLE, recvDoubles, 0, ScatterParams.DOUBLE_ARRAY_SIZE, MPI.DOUBLE, 0);
+        MPI.COMM_WORLD.Scatter(allInts, 0, ScatterParams.INT_ARRAY_SIZE, MPI.INT, recvInts, 0, ScatterParams.INT_ARRAY_SIZE, MPI.INT, 0);
 
         if (rank == 0) {
             //start GUI

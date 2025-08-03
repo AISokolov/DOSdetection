@@ -1,4 +1,7 @@
 public class ScatterParams {
+    public static final int DOUBLE_ARRAY_SIZE = 2;  //
+    public static final int INT_ARRAY_SIZE = 6;     //
+
     public double warningThreshold;
     public int maximumPacketsLimit;
     public double timeGap;

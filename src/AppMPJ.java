@@ -33,7 +33,6 @@ public class AppMPJ extends JFrame {
         this.config = config;
         setTitle("DOS Detection (MPJ) - " + config.name);
         setSize(600, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -101,7 +100,7 @@ public class AppMPJ extends JFrame {
             while (isRunning) {
                 try {
                     int[] msg = new int[2];
-                    MPI.COMM_WORLD.Recv(msg, 0, 2, MPI.INT, MPI.ANY_SOURCE, 99);
+                    MPI.COMM_WORLD.Recv(msg, 0, 2, MPI.INT, MPI.ANY_SOURCE, 1);
                     int packetType = msg[0];
                     totalPackets++;
                     updateMovingAverage(packetType == 1 ? 1 : -1);
@@ -201,9 +200,13 @@ public class AppMPJ extends JFrame {
             g.drawLine(offsetX, offsetY, offsetX, offsetY + h); // Y
             g.drawLine(offsetX, offsetY + h, offsetX + w, offsetY + h); // X
 
-            double maxAvg = movingAverageHistory.stream().mapToDouble(Double::doubleValue).max().orElse(1.0);
-            double minAvg = movingAverageHistory.stream().mapToDouble(Double::doubleValue).min().orElse(-1.0);
-            double range = Math.max(1e-6, maxAvg - minAvg);
+            double maxAvg = movingAverageHistory.get(0);
+            double minAvg = movingAverageHistory.get(0);
+            for (Double value : movingAverageHistory) {
+                if (value > maxAvg) maxAvg = value;
+                if (value < minAvg) minAvg = value;
+            }
+            double range = (maxAvg == minAvg) ? 1.0 : maxAvg - minAvg;
 
             Graphics2D g2 = (Graphics2D) g;
             g2.setStroke(new BasicStroke(2f));
@@ -227,7 +230,7 @@ public class AppMPJ extends JFrame {
             for (int i = 0; i < n; i += step) {
                 int x = offsetX + (w * i) / (n - 1);
                 g.drawLine(x, offsetY + h, x, offsetY + h + 5);
-                g.drawString(String.valueOf((timeIndex - n + i) * 100 / 1000.0), x - 5, offsetY + h + 20); // X: секунды
+                g.drawString(String.valueOf((timeIndex - n + i) * 100 / 1000.0), x - 5, offsetY + h + 20); // X: seconds
             }
             for (int i = 0; i <= 5; i++) {
                 int y = offsetY + h - (h * i) / 5;
