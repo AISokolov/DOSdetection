@@ -1,0 +1,9 @@
+-----COMPILING------
+javac -cp "C:\mpj-v0_44\lib\mpj.jar" -d ..\target\classes AppMPJ.java MainMPJ.java PacketSenderMPJ.java
+-----RUNNING------
+C:\mpj-v0_44\bin\mpjrun.bat -np 4 -cp target\classes MainMPJ
+-----EXTRA------
+JavaFX which I used in previous versions of this program is not used anymore.
+JavaFX is not connectible with MPJ Express.
+Google hasn't given me any insights about that.
+I used JavaSwing to create a simple GUI.
