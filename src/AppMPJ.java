@@ -99,7 +99,10 @@ public class AppMPJ extends JFrame {
         packetThread = new Thread(() -> {
             while (isRunning) {
                 try {
+                    // 1 - packet type 2 - source rank
                     int[] msg = new int[2];
+                    //Recv is thread blocking operation. so I need to run it in separate thread
+                    //to not block the UI thread
                     MPI.COMM_WORLD.Recv(msg, 0, 2, MPI.INT, MPI.ANY_SOURCE, 1);
                     int packetType = msg[0];
                     totalPackets++;
@@ -153,7 +156,7 @@ public class AppMPJ extends JFrame {
             showWarningIcon();
         }
 
-        // Логика остановки по лимиту трафика
+        // Traffic limit check
         long currentTime = System.currentTimeMillis();
         double elapsedTimeInMinutes = (currentTime - startTime) / 60000.0;
         if (!isStoppedByLimit && totalPackets >= config.maximumPacketsLimit && elapsedTimeInMinutes >= config.timeGap) {
@@ -188,11 +191,11 @@ public class AppMPJ extends JFrame {
 
             int w = getWidth() - 60;
             int h = getHeight() - 60;
-            int offsetX = 40;
-            int offsetY = 40;
+            int offsetX = 40; //margin
+            int offsetY = 40; //margin
             int n = movingAverageHistory.size();
             if (n < 2) return;
-
+            //scale values from 0..1
             double maxAvg = movingAverageHistory.get(0);
             double minAvg = movingAverageHistory.get(0);
             for (Double value : movingAverageHistory) {
@@ -202,13 +205,17 @@ public class AppMPJ extends JFrame {
             double range = (maxAvg == minAvg) ? 1.0 : maxAvg - minAvg;
 
             Graphics2D g2 = (Graphics2D) g;
-            g2.setStroke(new BasicStroke(2f));
+            g2.setStroke(new BasicStroke(2f));  //line width
             g2.setColor(Color.RED);
 
             java.awt.geom.GeneralPath path = new java.awt.geom.GeneralPath();
             for (int i = 0; i < n; i++) {
                 int x = offsetX + (w * i) / (n - 1);
                 double avg = movingAverageHistory.get(i);
+                //(avg - minAvg) → shift → lowest = 0
+                // range → normalize into 0..1
+                //* h → scale into pixel height
+                //h - (...) → flip so highest data shows at top
                 int y = offsetY + h - (int) ((avg - minAvg) / range * h);
                 if (i == 0) {
                     path.moveTo(x, y);

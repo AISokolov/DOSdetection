@@ -24,6 +24,7 @@ public class ScatterParams {
         this.defaultSleepTime = config.defaultSleepTime;
     }
 
+    //serialization methods to convert to/from arrays
     public double[] toDoubleArray() {
         return new double[] {
                 warningThreshold,

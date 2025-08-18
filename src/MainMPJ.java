@@ -21,6 +21,7 @@ public class MainMPJ {
         //root(sender) process (rank 0) fills the arrays with data
         if (rank == 0) {
             for (int i = 1; i < size; i++) {
+                //provide cyclic distribution of configs
                 ScatterParams sp = new ScatterParams(configs[(i - 1) % configs.length]);
                 int doubleOffset = i * ScatterParams.DOUBLE_ARRAY_SIZE;
                 int intOffset = i * ScatterParams.INT_ARRAY_SIZE;
@@ -43,6 +44,7 @@ public class MainMPJ {
                 }
             });
         } else {
+            // converting the row arrays to ScatterParams object
             ScatterParams sp = ScatterParams.fromArrays(recvDoubles, recvInts);
             PacketSenderMPJ sender = new PacketSenderMPJ(rank, sp);
             sender.run();
