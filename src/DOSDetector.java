@@ -43,6 +43,7 @@ public class DOSDetector {
             while (isRunning) {
                 try {
                     Socket clientSocket = server.accept();
+                    // wait for a free worker thread and handle the client in a separate thread
                     clientHandlerExecutor.submit(() -> handleClient(clientSocket));
                 }
                 catch (IOException e) {
